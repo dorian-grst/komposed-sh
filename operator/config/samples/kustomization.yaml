@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- komposed-sh_v1alpha1_komposemanifest.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples
