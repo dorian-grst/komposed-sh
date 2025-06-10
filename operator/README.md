@@ -1,21 +1,16 @@
-# komposed-sh
+# Operator
 
 ## Description
 
-**komposed-sh** is a Kubernetes Operator built with the Operator SDK. Its purpose is to automatically convert `docker-compose.yaml` files into Kubernetes manifests directly within a cluster.
+This directory contains the source code for the **komposed-sh Operator**, built using the Operator SDK in Go.
 
-By defining a custom resource (`KomposeManifest`), users can submit a Docker Compose file as a YAML string. The operator will then:
+The operator watches for custom resources of kind `KomposeManifest` and performs the following actions:
 
-1. Convert the file into Kubernetes manifests using [Kompose](https://github.com/kubernetes/kompose),
-2. Automatically apply those manifests in the target namespace using `kubectl`.
+1. **Reads the Docker Compose content** from the `dockerCompose` field.
+2. **Converts** the Compose definition into Kubernetes manifests using the [`kompose`](https://kompose.io/) CLI.
+3. **Applies** the generated manifests directly into the cluster within the same namespace as the resource.
 
-This project is designed to fit into a GitOps workflow, where the conversion and deployment of Compose-based applications are automated and version-controlled.
-
-### Use Cases
-
-- Quickly migrate existing applications from Docker Compose to Kubernetes.
-- Integrate Compose-to-Kubernetes conversion into GitOps pipelines (e.g., with ArgoCD).
-- Eliminate manual errors when translating Docker configurations to Kubernetes resources.
+This allows developers to declaratively define Docker Compose services and deploy them to Kubernetes using GitOps.
 
 ## Getting Started
 
@@ -25,7 +20,7 @@ This project is designed to fit into a GitOps workflow, where the conversion and
 - docker version 17.03+.
 - kubectl version v1.11.3+.
 - kompose version v1.0.0+.
-- Access to a Kubernetes v1.11.3+ cluster.
+- access to a Kubernetes v1.11.3+ cluster.
 
 ### To Deploy on the cluster
 
