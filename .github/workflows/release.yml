@@ -1,0 +1,43 @@
+name: Release Operator
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Build and Push Operator Image
+    runs-on: ubuntu-latest
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: vars
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Operator image
+        working-directory: operator
+        run: |
+          make docker-build docker-push IMG=ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.VERSION }}
