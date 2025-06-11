@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: projects
+  namespace: argocd
+spec:
+  project: komposed-sh
+  source:
+    repoURL: 'https://github.com/dorian-grst/komposed-sh'
+    path: sample/
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: services
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
