@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*.*.*'
-    branches:
-      - main
 
 jobs:
   release:
@@ -13,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
 
     steps:
@@ -41,3 +38,19 @@ jobs:
         working-directory: operator
         run: |
           make docker-build docker-push IMG=ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.VERSION }}
+
+      - name: Generate install.yaml
+        working-directory: operator
+        run: |
+          make build-installer IMG=ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.VERSION }}
+
+      - name: Commit and push install.yaml to main
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git fetch origin main
+          git checkout main
+          cp operator/dist/install.yaml operator/dist/install.yaml
+          git add operator/dist/install.yaml
+          git commit -m "chore: update install.yaml for version ${{ steps.vars.outputs.VERSION }}"
+          git push origin main
