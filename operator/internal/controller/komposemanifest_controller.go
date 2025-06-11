@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -34,14 +36,14 @@ func (r *KomposeManifestReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Crée un répertoire temporaire pour Kompose
+	// Create a temporary directory for Kompose
 	tmpDir := filepath.Join(os.TempDir(), fmt.Sprintf("kompose-%s", time.Now().Format("20060102150405")))
 	if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
 		return ctrl.Result{}, err
 	}
 	defer os.RemoveAll(tmpDir)
 
-	// Écrire docker-compose.yaml dans tmpDir
+	// Write docker-compose.yaml into tmpDir
 	composePath := filepath.Join(tmpDir, "docker-compose.yaml")
 	if err := os.WriteFile(composePath, []byte(manifest.Spec.DockerCompose), 0644); err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to write compose file: %w", err)
@@ -57,7 +59,7 @@ func (r *KomposeManifestReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, fmt.Errorf("kompose convert failed: %v - %s", err, convertErr.String())
 	}
 
-	// Kubectl apply
+	// Read and apply the generated YAML files
 	files, err := os.ReadDir(tmpDir)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to read tmpDir: %w", err)
@@ -72,18 +74,60 @@ func (r *KomposeManifestReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 			continue
 		}
 
-		applyCmd := exec.Command("kubectl", "apply", "-f", filepath.Join(tmpDir, name), "-n", manifest.Namespace)
-		var applyOut, applyErr bytes.Buffer
-		applyCmd.Stdout = &applyOut
-		applyCmd.Stderr = &applyErr
-		if err := applyCmd.Run(); err != nil {
-			log.Error(err, "kubectl apply failed", "file", name, "stdout", applyOut.String(), "stderr", applyErr.String())
-			return ctrl.Result{}, fmt.Errorf("kubectl apply failed for file %s: %v - %s", name, err, applyErr.String())
+		filePath := filepath.Join(tmpDir, name)
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			log.Error(err, "failed to read file", "file", name)
+			return ctrl.Result{}, fmt.Errorf("failed to read file %s: %w", name, err)
+		}
+
+		// Decode the YAML content into unstructured objects
+		decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(content), 4096)
+		for {
+			var u unstructured.Unstructured
+			if err := decoder.Decode(&u); err != nil {
+				break
+			}
+
+			// Apply the unstructured object
+			if err := r.Apply(ctx, &u, manifest.Namespace); err != nil {
+				log.Error(err, "failed to apply resource", "file", name)
+				return ctrl.Result{}, fmt.Errorf("failed to apply resource from file %s: %w", name, err)
+			}
 		}
 	}
 
 	log.Info("Successfully reconciled KomposeManifest", "name", manifest.Name)
 	return ctrl.Result{}, nil
+}
+
+// Apply applies a Kubernetes resource using the controller-runtime client
+func (r *KomposeManifestReconciler) Apply(ctx context.Context, obj *unstructured.Unstructured, namespace string) error {
+	// Set the namespace for the object
+	obj.SetNamespace(namespace)
+
+	// Get the current state of the resource
+	current := &unstructured.Unstructured{}
+	current.SetGroupVersionKind(obj.GroupVersionKind())
+	err := r.Get(ctx, client.ObjectKeyFromObject(obj), current)
+	if err != nil {
+		if client.IgnoreNotFound(err) != nil {
+			return fmt.Errorf("failed to get resource: %w", err)
+		}
+		// Resource does not exist, create it
+		if err := r.Create(ctx, obj); err != nil {
+			return fmt.Errorf("failed to create resource: %w", err)
+		}
+		return nil
+	}
+
+	// Resource exists, update it
+	obj.SetResourceVersion(current.GetResourceVersion())
+	if err := r.Update(ctx, obj); err != nil {
+		return fmt.Errorf("failed to update resource: %w", err)
+	}
+
+	return nil
 }
 
 func (r *KomposeManifestReconciler) SetupWithManager(mgr ctrl.Manager) error {
