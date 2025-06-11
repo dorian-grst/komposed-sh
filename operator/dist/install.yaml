@@ -204,15 +204,15 @@ rules:
 - apiGroups:
   - apps
   resources:
-  - deployments
+  - '*'
   verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - '*'
+  verbs:
+  - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -334,7 +334,7 @@ spec:
         - --health-probe-bind-address=:8081
         command:
         - /manager
-        image: ghcr.io/dorian-grst/komposed-sh:v0.0.7
+        image: ghcr.io/dorian-grst/komposed-sh:v0.0.9
         livenessProbe:
           httpGet:
             path: /healthz
