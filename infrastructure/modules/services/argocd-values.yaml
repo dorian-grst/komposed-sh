@@ -1,0 +1,112 @@
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  resources:
+   requests:
+     cpu: 457m
+     memory: 889Mi
+   limits:
+     memory: 1000Mi
+
+dex:
+  resources: 
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+server:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+repoServer:
+  resources:
+    requests:controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  resources:
+   requests:
+     cpu: 457m
+     memory: 889Mi
+   limits:
+     memory: 1000Mi
+
+dex:
+  resources: 
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+
+
+repoServer:
+  resources:
+    requests:
+      cpu: 392m
+      memory: 176Mi
+    limits:
+      memory: 400Mi
+
+applicationSet:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+notifications:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+      cpu: 392m
+      memory: 176Mi
+    limits:
+      memory: 400Mi
+
+applicationSet:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
+
+notifications:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      memory: 400Mi
