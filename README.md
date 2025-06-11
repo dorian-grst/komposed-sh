@@ -18,6 +18,6 @@ This project is part of an advanced Kubernetes & GitOps lab, focusing on:
 .
 ├── infrastructure/       # Manifests for installing the operator and setting up the cluster
 ├── operator/             # Source code of the Operator (Go + Operator SDK)
-├── example/               # GitOps-watched directory (e.g. by ArgoCD) containing KomposeManifest resources
+├── sample/               # GitOps-watched directory (e.g. by ArgoCD) containing KomposeManifest resources
 └── README.md             # Project documentation
 ```
