@@ -322,7 +322,7 @@ spec:
         - --health-probe-bind-address=:8081
         command:
         - /manager
-        image: ghcr.io/dorian-grst/komposed-sh:v0.0.2
+        image: ghcr.io/dorian-grst/komposed-sh:v0.0.3
         livenessProbe:
           httpGet:
             path: /healthz
