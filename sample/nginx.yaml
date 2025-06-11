@@ -1,0 +1,15 @@
+apiVersion: komposed-sh.komposed.sh/v1alpha1
+kind: KomposeManifest
+metadata:
+  labels:
+    app.kubernetes.io/name: komposed-sh
+    app.kubernetes.io/managed-by: kustomize
+  name: komposemanifest-sample-nginx
+spec:
+  dockerCompose: |
+    version: "3"
+    services:
+      web:
+        image: nginx
+        ports:
+          - "80:80"
