@@ -30,12 +30,9 @@ rules:
   - get
   - patch
   - update
-- apiGroups:
-  - apps
-  resources:
-  - *
-  verbs:
-  - *
+- apiGroups: ["apps"]
+  resources: ["*"]
+  verbs: ["*"]
 - apiGroups: [""]
   resources: ["*"]
   verbs: ["*"]
