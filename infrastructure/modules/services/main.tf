@@ -21,3 +21,14 @@ resource "null_resource" "install_crds" {
     command = "kubectl apply -f ${each.value}"
   }
 }
+
+resource "kubernetes_manifest" "argocd_project" {
+  depends_on = [helm_release.argocd]
+  manifest = yamldecode(file("${path.module}/argocd-project.yaml"))
+}
+
+resource "kubernetes_manifest" "argocd_app" {
+  depends_on = [null_resource.install_crds, kubernetes_manifest.argocd_project]
+  manifest = yamldecode(file("${path.module}/argocd-application.yaml"))
+}
+

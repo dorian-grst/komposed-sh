@@ -24,8 +24,14 @@ terraform {
 locals {
   node_name = "gryffondor-3"
 }
+variable "proxmox_password" {
+  type = string
+}
+
 provider "proxmox" {
   endpoint = "https://162.38.112.67:8006/"
+  username = "root@pam"
+  password = var.proxmox_password
   insecure = true
   ssh {
     agent = true
@@ -71,7 +77,7 @@ variable "cluster" {
 module "template" {
   source = "./modules/template"
   node_name = local.node_name
-  talos_url ="https://factory.talos.dev/image/9da91404d9f8586bcf78143057fb82d8c50e5556ecc7d78192dfc23b428d4d4b/v1.10.3/nocloud-amd64.raw.gz"
+  talos_url = "https://factory.talos.dev/image/b16fa6e98be85b7046507ed5256a6f3840ed9b375ec82673fab4a388332c1924/v1.10.4/nocloud-amd64.raw.gz"
 }
 
 module "node" {
@@ -120,5 +126,6 @@ module "talos" {
 }
 
 module "services" {
+  depends_on = [module.talos]
   source = "./modules/services"
 }

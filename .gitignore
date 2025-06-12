@@ -22,3 +22,5 @@ terraform.tfstate.lock.info~
 terraform.tfstate.lock
 terraform.tfstate.lock~
 terraform.tfstate
+terraform.tfvars
+**/terraform.tfvars
