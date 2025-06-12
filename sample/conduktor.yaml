@@ -59,7 +59,7 @@ spec:
         volumes:
           - pg_data:/var/lib/postgresql/data
         environment:
-          PGDATA: "/var/lib/postgresql/data"
+          PGDATA: "/var/lib/postgresql/data/conduktor"
           POSTGRES_DB: "conduktor-console"
           POSTGRES_USER: "conduktor"
           POSTGRES_PASSWORD: "change_me"
@@ -79,7 +79,7 @@ spec:
         volumes:
           - pg_data_sql:/var/lib/postgresql/data
         environment:
-          PGDATA: "/var/lib/postgresql/data"
+          PGDATA: "/var/lib/postgresql/data/conduktor"
           POSTGRES_DB: "conduktor-sql"
           POSTGRES_USER: "conduktor"
           POSTGRES_PASSWORD: "change_me"
