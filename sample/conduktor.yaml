@@ -56,10 +56,7 @@ spec:
       postgresql:
         image: postgres:14
         hostname: postgresql
-        volumes:
-          - pg_data:/var/lib/postgresql/data
         environment:
-          PGDATA: "/var/lib/postgresql/data/conduktor"
           POSTGRES_DB: "conduktor-console"
           POSTGRES_USER: "conduktor"
           POSTGRES_PASSWORD: "change_me"
@@ -76,10 +73,7 @@ spec:
       postgresql-2:
         image: postgres:14
         hostname: postgresql-sql
-        volumes:
-          - pg_data_sql:/var/lib/postgresql/data
         environment:
-          PGDATA: "/var/lib/postgresql/data/conduktor"
           POSTGRES_DB: "conduktor-sql"
           POSTGRES_USER: "conduktor"
           POSTGRES_PASSWORD: "change_me"
@@ -164,7 +158,5 @@ spec:
           conduktor-gateway:
             condition: service_healthy
     volumes:
-      pg_data: {}
-      pg_data_sql: {}
       conduktor_data: {}
       redpanda-0: {}
